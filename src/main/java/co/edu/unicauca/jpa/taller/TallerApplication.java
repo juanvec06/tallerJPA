@@ -1,5 +1,6 @@
 package co.edu.unicauca.jpa.taller;
 
+import co.edu.unicauca.jpa.taller.accesoDatos.dto.FormatoADetalleDTO;
 import co.edu.unicauca.jpa.taller.accesoDatos.model.Docente;
 import co.edu.unicauca.jpa.taller.accesoDatos.model.Evaluacion;
 import co.edu.unicauca.jpa.taller.accesoDatos.model.FormatoA;
@@ -17,7 +18,9 @@ import co.edu.unicauca.jpa.taller.accesoDatos.repositories.RolRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.boot.CommandLineRunner;
@@ -58,9 +61,10 @@ public class TallerApplication {
 	@Bean
 	CommandLineRunner demoRunner(TallerApplication app) {
 		return args -> {
-			//app.ejecutarPruebas();
-			metodo1();
-			getFormatosByDocente("Ana");
+			//app.ejecutarPruebas(); // Esto es de la parte 1.
+			//metodo1();
+			//getFormatosByDocente("Ana");
+			getInfoDetalladaFormatoA("Formato TIA - Sistema de sisas");
 		};
 	}
 
@@ -347,6 +351,62 @@ public class TallerApplication {
 		System.out.println("\n=== FORMATOS DEL DOCENTE " + nombreDocente + " ===");
 		for (FormatoA formato : formatos) {
 			System.out.println("FormatoA " + formato.getIdFormatoA() + " - " + formato.getTitulo());
+		}
+	}
+	private void getInfoDetalladaFormatoA(String titulo) {
+		List<FormatoADetalleDTO> filas = formatoARepository.findFormatoADetalladoPorTitulo(titulo);
+		if (filas.isEmpty()) {
+			System.out.println("No se encontró el FormatoA con título: " + titulo);
+			return;
+		}
+
+		FormatoADetalleDTO encabezado = filas.get(0);
+		System.out.println("\n=== INFORMACIÓN DETALLADA DEL FORMATO A ===");
+		System.out.println("Título: " + encabezado.formatoTitulo());
+		System.out.println("Docente: " + encabezado.nombreCompletoDirector());
+		System.out.println("Estado: " + valorSeguro(encabezado.estadoActual()));
+
+		Map<Integer, String> conceptosPorEvaluacion = new LinkedHashMap<>();
+		Map<Integer, Map<Integer, String>> textoPorObservacion = new LinkedHashMap<>();
+		Map<Integer, Map<Integer, List<String>>> docentesPorObservacion = new LinkedHashMap<>();
+
+		for (FormatoADetalleDTO fila : filas) {
+			Integer idEvaluacion = fila.evaluacionId();
+			if (idEvaluacion == null) {
+				continue;
+			}
+
+			conceptosPorEvaluacion.putIfAbsent(idEvaluacion, valorSeguro(fila.evaluacionConcepto()));
+			textoPorObservacion.computeIfAbsent(idEvaluacion, k -> new LinkedHashMap<>());
+			docentesPorObservacion.computeIfAbsent(idEvaluacion, k -> new LinkedHashMap<>());
+
+			Integer idObservacion = fila.observacionId();
+			if (idObservacion == null) {
+				continue;
+			}
+
+			textoPorObservacion.get(idEvaluacion).putIfAbsent(idObservacion, valorSeguro(fila.observacionTexto()));
+			docentesPorObservacion.get(idEvaluacion).computeIfAbsent(idObservacion, k -> new ArrayList<>());
+
+			String docenteObservacion = fila.nombreCompletoDocenteObservacion();
+			if (!docenteObservacion.isBlank() && !docentesPorObservacion.get(idEvaluacion).get(idObservacion).contains(docenteObservacion)) {
+				docentesPorObservacion.get(idEvaluacion).get(idObservacion).add(docenteObservacion);
+			}
+		}
+
+		for (Map.Entry<Integer, String> evaluacion : conceptosPorEvaluacion.entrySet()) {
+			Integer idEvaluacion = evaluacion.getKey();
+			System.out.println("Evaluación " + idEvaluacion + " concepto: " + evaluacion.getValue());
+
+			Map<Integer, String> observaciones = textoPorObservacion.getOrDefault(idEvaluacion, Map.of());
+			for (Map.Entry<Integer, String> observacion : observaciones.entrySet()) {
+				Integer idObservacion = observacion.getKey();
+				String docentes = String.join(", ", docentesPorObservacion
+						.getOrDefault(idEvaluacion, Map.of())
+						.getOrDefault(idObservacion, List.of()));
+				System.out.println("  Observación " + idObservacion + ": " + observacion.getValue());
+				System.out.println("    Docentes que la plantean: " + docentes);
+			}
 		}
 	}
 }
