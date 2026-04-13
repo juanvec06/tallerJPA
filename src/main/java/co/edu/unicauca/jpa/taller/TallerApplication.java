@@ -57,11 +57,59 @@ public class TallerApplication {
 
 	@Bean
 	CommandLineRunner demoRunner(TallerApplication app) {
-		return args -> app.ejecutarPruebas();
+		return args -> {
+			//app.ejecutarPruebas();
+			metodo1();
+			getFormatosByDocente("Ana");
+		};
 	}
 
 	@Transactional(readOnly = false)
 	public void ejecutarPruebas() {
+		FormatoA f1 = crearFormatoA(
+			true,
+			"Formato TIA - Sistema de sisas",
+			"Construir un sistema de sisas",
+			"Levantar requisitos y sisas",
+			"Ana",
+			"Ano",
+			"Grupo A",
+			"ana.ano@unicauca.edu.co",
+			"Laura Estudiante",
+			"Carlos Asesor");
+		FormatoA f2 = crearFormatoA(
+			true,
+			"Formato TIA - Sistema de kk",
+			"Construir un sistema de kk",
+			"Levantar requisitos y kk",
+			"Ana",
+			"Zorra",
+			"Grupo A",
+			"ana.zorra@unicauca.edu.co",
+			"Laura Estudiante",
+			"Carlos Asesor");
+		FormatoA f3 = crearFormatoA(
+				true,
+				"Formato TIA - Sistema de test",
+				"Construir un sistema de test",
+				"Levantar requisitos y test",
+				"Ano",
+				"Test",
+				"Grupo B",
+				"ana.zorra@unicauca.edu.co",
+				"Laura Estudiante",
+				"Carlos Asesor");
+		FormatoA f4 = crearFormatoA(
+				true,
+				"Formato TIA - Sistema de testeo",
+				"Construir un sistema de testeo",
+				"Levantar requisitos y testeo",
+				"Anus",
+				"Testeo",
+				"Grupo B",
+				"ana.zorra@unicauca.edu.co",
+				"Laura Estudiante",
+				"Carlos Asesor");
 		FormatoA formatoTIA = crearFormatoA(
 				true,
 				"Formato TIA - Sistema de Alertas",
@@ -280,6 +328,7 @@ public class TallerApplication {
 	}
 
 	// Listar docentes ordenados por apellidos_docente, filtrando por grupo y patrón de búsqueda (ignorando mayúsculas/minúsculas)
+	// No encontre un nombre descriptivo para el metodo.
 	private void metodo1() {
 		String grupoFiltro = "Grupo A";
 
@@ -292,4 +341,12 @@ public class TallerApplication {
 
 	}
 
+	//	En el repositorio formatos obtener formatos de un docente específico ignorando mayúsculas y minúsculas
+	private void getFormatosByDocente(String nombreDocente) {
+		List<FormatoA> formatos = formatoARepository.findByDocente_NombresDocenteIgnoreCase(nombreDocente);
+		System.out.println("\n=== FORMATOS DEL DOCENTE " + nombreDocente + " ===");
+		for (FormatoA formato : formatos) {
+			System.out.println("FormatoA " + formato.getIdFormatoA() + " - " + formato.getTitulo());
+		}
+	}
 }
