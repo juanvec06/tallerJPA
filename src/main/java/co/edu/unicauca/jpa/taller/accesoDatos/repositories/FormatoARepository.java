@@ -11,6 +11,6 @@ public interface FormatoARepository extends JpaRepository<FormatoA, Integer> {
 
 	Optional<FormatoA> findByTitulo(String titulo);
 
-	@EntityGraph(attributePaths = {"docente", "estado", "evaluaciones", "evaluaciones.observaciones", "evaluaciones.observaciones.docentes"})
+	@EntityGraph(attributePaths = {"docente", "estado", "evaluaciones"})
 	Optional<FormatoA> findDetalleByIdFormatoA(Integer idFormatoA);
 }

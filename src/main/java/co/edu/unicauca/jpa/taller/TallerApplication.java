@@ -279,4 +279,17 @@ public class TallerApplication {
 		return valor == null ? "" : valor;
 	}
 
+	// Listar docentes ordenados por apellidos_docente, filtrando por grupo y patrón de búsqueda (ignorando mayúsculas/minúsculas)
+	private void metodo1() {
+		String grupoFiltro = "Grupo A";
+
+		List<Docente> docentesFiltrados = docenteRepository.findByNombreGrupoStartingWithIgnoreCaseOrderByApellidosDocente(grupoFiltro, "A");
+
+		System.out.println("\n=== DOCENTES FILTRADOS Y ORDENADOS ===");
+		for (Docente docente : docentesFiltrados) {
+			System.out.println(nombreCompleto(docente) + " | Grupo: " + docente.getNombreGrupo());
+		}
+
+	}
+
 }

@@ -46,14 +46,14 @@ public class FormatoA {
     @Column(name = "objetivos_especificos", columnDefinition = "TEXT")
     private String objetivosEspecificos;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "idfk_docente", nullable = false)
     private Docente docente;
 
-    @OneToOne(fetch = FetchType.EAGER, mappedBy = "formatoA", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "formatoA", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Estado estado;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "formatoA")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "formatoA")
     private List<Evaluacion> evaluaciones = new ArrayList<>();
 
     @PrePersist
