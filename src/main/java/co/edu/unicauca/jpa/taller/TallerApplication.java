@@ -61,10 +61,17 @@ public class TallerApplication {
 	@Bean
 	CommandLineRunner demoRunner(TallerApplication app) {
 		return args -> {
-			//app.ejecutarPruebas(); // Esto es de la parte 1.
+			// PARTE 1 (EJECUTAR ANTES DE TODOS)
+			//app.ejecutarPruebas();
+
+			// PARTE 2
+			// Arteaga
+			// ...
+			// Vela
 			//metodo1();
 			//getFormatosByDocente("Ana");
-			getInfoDetalladaFormatoA("Formato TIA - Sistema de sisas");
+			//getInfoDetalladaFormatoA("Formato TIA - Sistema de sisas");
+			consultaCorreoDocente("ana.zorra@unicauca.edu.co");
 		};
 	}
 
@@ -353,6 +360,7 @@ public class TallerApplication {
 			System.out.println("FormatoA " + formato.getIdFormatoA() + " - " + formato.getTitulo());
 		}
 	}
+	// Crear una query que reciba el título de un formato A, y realice un join entre docentes usando JPQL.
 	private void getInfoDetalladaFormatoA(String titulo) {
 		List<FormatoADetalleDTO> filas = formatoARepository.findFormatoADetalladoPorTitulo(titulo);
 		if (filas.isEmpty()) {
@@ -407,6 +415,18 @@ public class TallerApplication {
 				System.out.println("  Observación " + idObservacion + ": " + observacion.getValue());
 				System.out.println("    Docentes que la plantean: " + docentes);
 			}
+		}
+	}
+	// Consulta si ya existe un docente con un correo específico usando una query nativa.
+	private void consultaCorreoDocente(String correo) {
+		if (docenteRepository.existeConCorreo(correo) > 0) {
+			System.out.println("------------------------------------------------------");
+			System.out.println("Ya existe un docente con el correo: " + correo);
+			System.out.println("------------------------------------------------------");
+		} else {
+			System.out.println("------------------------------------------------------");
+			System.out.println("No existe un docente con el correo: " + correo);
+			System.out.println("------------------------------------------------------");
 		}
 	}
 }

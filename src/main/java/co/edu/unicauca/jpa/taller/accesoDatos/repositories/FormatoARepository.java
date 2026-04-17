@@ -25,7 +25,7 @@ public interface FormatoARepository extends JpaRepository<FormatoA, Integer> {
 		formato A, evaluaciones y observaciones. Debe retornar como resultado información del
 		formato A y un histórico de evaluaciones, observaciones y docente que la planteo. Usar JPQL
 	 */
-	@Query("SELECT new FormatoADetalleDTO(" +
+	@Query("SELECT new co.edu.unicauca.jpa.taller.accesoDatos.dto.FormatoADetalleDTO(" +
 			"f.idFormatoA, f.titulo, d.nombresDocente, d.apellidosDocente, es.estadoActual, " +
 			"e.idEvaluacion, e.concepto, o.idObservacion, o.observacion, od.nombresDocente, od.apellidosDocente) " +
 			"FROM FormatoA f " +
