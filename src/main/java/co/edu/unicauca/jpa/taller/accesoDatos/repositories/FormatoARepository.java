@@ -5,6 +5,7 @@ import co.edu.unicauca.jpa.taller.accesoDatos.model.FormatoA;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -37,4 +38,11 @@ public interface FormatoARepository extends JpaRepository<FormatoA, Integer> {
 			"WHERE f.titulo = :titulo " +
 			"ORDER BY e.idEvaluacion, o.idObservacion, od.idDocente")
 	List<FormatoADetalleDTO> findFormatoADetalladoPorTitulo(@Param("titulo") String titulo);
+
+	@Query(value = "SELECT COUNT(*) > 0 FROM formatosa WHERE titulo = :titulo", nativeQuery = true)
+	boolean existsByTituloNative(@Param("titulo") String titulo);
+
+	@Modifying
+	@Query("UPDATE Estado e SET e.estadoActual = :nuevoEstado WHERE e.formatoA.idFormatoA = :idFormatoA")
+	void updateEstadoByFormatoAId(@Param("idFormatoA") Integer idFormatoA, @Param("nuevoEstado") String nuevoEstado);
 }

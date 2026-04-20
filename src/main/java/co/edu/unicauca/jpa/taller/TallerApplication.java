@@ -66,6 +66,7 @@ public class TallerApplication {
 
 			// PARTE 2
 			// Arteaga
+			app.buscarEvaluacionesPorFechasYNombreDocente(LocalDate.now().minusDays(30), LocalDate.now(), "Ana", "Zorra");
 			// ...
 			// Vela
 			//metodo1();
@@ -156,6 +157,11 @@ public class TallerApplication {
 		listarObservaciones(formatoTIA.getIdFormatoA());
 		listarMiembrosComite();
 		consultarFormatosAPorDocente(formatoTIA.getDocente().getIdDocente());
+
+		//Asignamos varias evaluaciones con diferentes fechas para probar la consulta de búsqueda por fechas y nombre docente
+		crearEvaluacionConFecha(formatoTIA.getIdFormatoA(), "Aprobado", LocalDate.now().minusDays(20), "Coordinador 1");
+		crearEvaluacionConFecha(f1.getIdFormatoA(), "Rechazado", LocalDate.now().minusDays(10), "Coordinador 2");
+		
 	}
 
 	@Transactional(readOnly = false)
@@ -330,6 +336,17 @@ public class TallerApplication {
 		return evaluacionRepository.save(nuevaEvaluacion);
 	}
 
+	private Evaluacion crearEvaluacionConFecha(Integer idFormatoA, String concepto, LocalDate fecha, String nombreCoordinador) {
+		FormatoA formato = formatoARepository.findById(idFormatoA)
+				.orElseThrow(() -> new IllegalArgumentException("No existe FormatoA con id " + idFormatoA));
+		Evaluacion nuevaEvaluacion = new Evaluacion();
+		nuevaEvaluacion.setConcepto(concepto);
+		nuevaEvaluacion.setFechaRegistroConcepto(fecha);
+		nuevaEvaluacion.setNombreCoordinador(nombreCoordinador);
+		nuevaEvaluacion.setFormatoA(formato);
+		return evaluacionRepository.save(nuevaEvaluacion);
+	}
+
 	private String nombreCompleto(Docente docente) {
 		return docente.getNombresDocente() + " " + docente.getApellidosDocente();
 	}
@@ -428,5 +445,37 @@ public class TallerApplication {
 			System.out.println("No existe un docente con el correo: " + correo);
 			System.out.println("------------------------------------------------------");
 		}
+	}
+
+	// Método para probar: Buscar evaluaciones por fecha de inicio, fecha de fin, para una parte del nombre de un docente ignorando mayúsculas y minúsculas.
+	@Transactional(readOnly = true)
+	public void buscarEvaluacionesPorFechasYNombreDocente(LocalDate fechaInicio, LocalDate fechaFin, String nombre, String apellido) {
+		List<Evaluacion> evaluaciones = evaluacionRepository.findByFechaRegistroConceptoBetweenAndFormatoA_Docente_NombresDocenteContainingIgnoreCaseOrFormatoA_Docente_ApellidosDocenteContainingIgnoreCase(fechaInicio, fechaFin, nombre, apellido);
+		System.out.println("\n=== BUSCAR EVALUACIONES POR FECHAS Y NOMBRE DOCENTE ===");
+		System.out.println("Fechas: " + fechaInicio + " a " + fechaFin + " | Nombre: " + nombre + " | Apellido: " + apellido);
+		for (Evaluacion evaluacion : evaluaciones) {
+			System.out.println("Evaluacion ID: " + evaluacion.getIdEvaluacion() + " | Concepto: " + valorSeguro(evaluacion.getConcepto()) + " | Fecha: " + evaluacion.getFechaRegistroConcepto() + " | Docente: " + nombreCompleto(evaluacion.getFormatoA().getDocente()));
+		}
+		if (evaluaciones.isEmpty()) {
+			System.out.println("No se encontraron evaluaciones.");
+		}
+	}
+
+	// Método para probar: Query SQL nativo - Verificar si existe un formato A con un título dado.
+	@Transactional(readOnly = true)
+	public void verificarExistenciaFormatoAPorTitulo(String titulo) {
+		boolean existe = formatoARepository.existsByTituloNative(titulo);
+		System.out.println("\n=== VERIFICAR EXISTENCIA FORMATO A POR TÍTULO (SQL NATIVO) ===");
+		System.out.println("Título: " + titulo);
+		System.out.println("¿Existe?: " + (existe ? "Sí" : "No"));
+	}
+
+	// Método para probar: Query JPQL - Actualizar el estado de un formato A.
+	@Transactional
+	public void actualizarEstadoFormatoA(Integer idFormatoA, String nuevoEstado) {
+		formatoARepository.updateEstadoByFormatoAId(idFormatoA, nuevoEstado);
+		System.out.println("\n=== ACTUALIZAR ESTADO FORMATO A (JPQL) ===");
+		System.out.println("ID Formato A: " + idFormatoA + " | Nuevo Estado: " + nuevoEstado);
+		System.out.println("Estado actualizado exitosamente.");
 	}
 }
