@@ -66,13 +66,15 @@ public class TallerApplication {
 
 			// PARTE 2
 			// Arteaga
-			app.buscarEvaluacionesPorFechasYNombreDocente(LocalDate.now().minusDays(30), LocalDate.now(), "Ana", "Zorra");
+			//app.buscarEvaluacionesPorFechasYNombreDocente(LocalDate.now().minusDays(10), LocalDate.now(), "Ana", "Zorra");
+			//verificarExistenciaFormatoAPorTitulo("Formato TIA - Sistema de sisas");
+			//app.actualizarEstadoFormatoA(1, "Aprobado");
 			// ...
 			// Vela
-			//metodo1();
+			buscarDocenteGrupoAPatronA();  // punto 1
 			//getFormatosByDocente("Ana");
 			//getInfoDetalladaFormatoA("Formato TIA - Sistema de sisas");
-			consultaCorreoDocente("ana.zorra@unicauca.edu.co");
+			//consultaCorreoDocente("ana.zorra@unicauca.edu.co");
 		};
 	}
 
@@ -357,10 +359,10 @@ public class TallerApplication {
 
 	// Listar docentes ordenados por apellidos_docente, filtrando por grupo y patrón de búsqueda (ignorando mayúsculas/minúsculas)
 	// No encontre un nombre descriptivo para el metodo.
-	private void metodo1() {
-		String grupoFiltro = "Grupo A";
+	private void buscarDocenteGrupoAPatronA() {
+		String grupoFiltro = "Grupo B";
 
-		List<Docente> docentesFiltrados = docenteRepository.findByNombreGrupoStartingWithIgnoreCaseOrderByApellidosDocente(grupoFiltro, "A");
+		List<Docente> docentesFiltrados = docenteRepository.findByNombreGrupoIgnoreCaseAndApellidosDocenteStartingWithIgnoreCaseOrderByApellidosDocente(grupoFiltro, "A");
 
 		System.out.println("\n=== DOCENTES FILTRADOS Y ORDENADOS ===");
 		for (Docente docente : docentesFiltrados) {
@@ -464,10 +466,10 @@ public class TallerApplication {
 	// Método para probar: Query SQL nativo - Verificar si existe un formato A con un título dado.
 	@Transactional(readOnly = true)
 	public void verificarExistenciaFormatoAPorTitulo(String titulo) {
-		boolean existe = formatoARepository.existsByTituloNative(titulo);
+		Integer existe = formatoARepository.existsByTituloNative(titulo);
 		System.out.println("\n=== VERIFICAR EXISTENCIA FORMATO A POR TÍTULO (SQL NATIVO) ===");
 		System.out.println("Título: " + titulo);
-		System.out.println("¿Existe?: " + (existe ? "Sí" : "No"));
+		System.out.println("¿Existe?: " + (existe > 0 ? "Sí" : "No"));
 	}
 
 	// Método para probar: Query JPQL - Actualizar el estado de un formato A.

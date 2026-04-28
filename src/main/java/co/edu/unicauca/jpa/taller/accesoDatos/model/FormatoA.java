@@ -50,7 +50,7 @@ public class FormatoA {
     @JoinColumn(name = "idfk_docente", nullable = false)
     private Docente docente;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "formatoA", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "formatoA", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Estado estado;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "formatoA")

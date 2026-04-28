@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface DocenteRepository extends JpaRepository<Docente, Integer> {
 
 	Optional<Docente> findByCorreo(String correo);
-	List<Docente> findByNombreGrupoStartingWithIgnoreCaseOrderByApellidosDocente(String nombreGrupo, String patronBusqueda);
+	List<Docente> findByNombreGrupoIgnoreCaseAndApellidosDocenteStartingWithIgnoreCaseOrderByApellidosDocente(String nombreGrupo, String patronBusqueda);
 
 	@EntityGraph(attributePaths = {"formatos"})
 	Optional<Docente> findConFormatosByIdDocente(Integer idDocente);
